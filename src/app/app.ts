@@ -20,7 +20,7 @@ export class App implements AfterViewInit {
   pendingExport = false;
 
   pixKey =
-    '00020126410014BR.GOV.BCB.PIX0119fyurivs@outlook.com5204000053039865802BR5901N6001C62070503***63041605';
+    '00020126410014BR.GOV.BCB.PIX0119d526834b-8244-48e5-90db-f61c6477d2ee5204000053039865802BR5901N6001C62070503***63041605';
   pixQrCodeDataUrl = '';
 
   // Configurações
