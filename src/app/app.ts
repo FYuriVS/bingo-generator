@@ -1,6 +1,7 @@
 import { Component, AfterViewInit, ViewChildren, QueryList, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import QRCode from 'qrcode';
 
 @Component({
   selector: 'app-root',
@@ -11,9 +12,16 @@ import { FormsModule } from '@angular/forms';
 })
 export class App implements AfterViewInit {
   title = 'bingo-generator';
+  titleBingo = '';
 
-  // Expor Math para uso no template
   Math = Math;
+
+  showDonationDialog = false;
+  pendingExport = false;
+
+  pixKey =
+    '00020126410014BR.GOV.BCB.PIX0119fyurivs@outlook.com5204000053039865802BR5901N6001C62070503***63041605';
+  pixQrCodeDataUrl = '';
 
   // Configurações
   cols: number = 5;
@@ -146,6 +154,19 @@ export class App implements AfterViewInit {
 
   get cartelasPorPagina(): number {
     return this.cartelasPorLinha * this.cartelasPorColuna;
+  }
+
+  get pixQrCode(): string {
+    const payload = encodeURIComponent(this.pixKey);
+
+    return `https://api.qrserver.com/v1/create-qr-code/?size=280x280&data=${payload}`;
+  }
+
+  async generatePixQrCode() {
+    this.pixQrCodeDataUrl = await QRCode.toDataURL(this.pixKey, {
+      width: 280,
+      margin: 2,
+    });
   }
 
   // Método para calcular layout automático
@@ -394,7 +415,27 @@ export class App implements AfterViewInit {
     });
   }
 
+  async continueExport(): Promise<void> {
+    this.showDonationDialog = false;
+
+    // pequeno delay para animação ficar suave
+    setTimeout(async () => {
+      await this.doExportPDF();
+    }, 200);
+  }
+
   async exportPDF(): Promise<void> {
+    console.log(this.generatedCards.length);
+
+    if (this.generatedCards.length < 1) {
+      return;
+    }
+    await this.generatePixQrCode();
+
+    this.showDonationDialog = true;
+  }
+
+  async doExportPDF(): Promise<void> {
     if (!this.generatedCards.length) return;
 
     const { jsPDF } = await import('jspdf');
@@ -474,7 +515,9 @@ export class App implements AfterViewInit {
       doc.setFont('helvetica', 'bold');
       const fontSizeHeader = Math.min(11, Math.max(8, headerH * 0.65));
       doc.setFontSize(fontSizeHeader);
-      doc.text(`BINGO GD`, ox + larguraCarta / 2, oy + headerH / 2 + 2, { align: 'center' });
+      doc.text(`${this.titleBingo ?? 'BINGO'}`, ox + larguraCarta / 2, oy + headerH / 2 + 2, {
+        align: 'center',
+      });
 
       const midIdx = Math.floor(this.rows / 2) * this.cols + Math.floor(this.cols / 2);
 

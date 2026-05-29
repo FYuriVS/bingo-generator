@@ -5,17 +5,23 @@
       BingoMaker Pro
     </div>
 
+    <div class="section">
+      <div class="section-label">Título do Bingo</div>
+      <div class="field">
+        <input type="text" [(ngModel)]="titleBingo" />
+      </div>
+    </div>
     <!-- Dimensões -->
     <div class="section">
       <div class="section-label">Dimensões</div>
       <div class="row2">
         <div class="field">
           <label>Colunas</label>
-          <input type="number" [(ngModel)]="cols" min="3" max="9" />
+          <input type="number" [(ngModel)]="cols" min="3" max="7" />
         </div>
         <div class="field">
           <label>Linhas</label>
-          <input type="number" [(ngModel)]="rows" min="3" max="9" />
+          <input type="number" [(ngModel)]="rows" min="3" max="7" />
         </div>
       </div>
       <div class="row2">
@@ -170,7 +176,7 @@
           [style.background]="currentPalette.header"
           [style.color]="currentPalette.text"
         >
-          BINGO • {{ (idx + 1).toString().padStart(2, '0') }}
+          {{ titleBingo }}
         </div>
         <div class="card-grid" [style.gridTemplateColumns]="'repeat(' + cols + ',1fr)'">
           <div
@@ -206,4 +212,28 @@
       </div>
     </div>
   </main>
+
+  <!-- DIALOG DOAÇÃO -->
+  <div class="donation-overlay" *ngIf="showDonationDialog">
+    <div class="donation-dialog">
+      <div class="donation-header">❤️ Apoie o projeto</div>
+
+      <p class="donation-text">
+        Esse gerador de bingo é gratuito e foi desenvolvido com muito carinho. Se quiser apoiar o
+        projeto, você pode fazer uma contribuição via PIX.
+      </p>
+
+      <img *ngIf="pixQrCodeDataUrl" [src]="pixQrCodeDataUrl" class="pix-qrcode" />
+
+      <div class="pix-key">
+        {{ pixKey }}
+      </div>
+
+      <div class="donation-actions">
+        <button class="btn-secondary" (click)="showDonationDialog = false">Agora não</button>
+
+        <button class="btn-primary" (click)="continueExport()">Continuar exportação</button>
+      </div>
+    </div>
+  </div>
 </div>
